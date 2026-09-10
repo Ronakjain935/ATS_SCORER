@@ -6,12 +6,13 @@
   <img src="https://img.shields.io/badge/Streamlit-1.32%2B-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit" />
   <img src="https://img.shields.io/badge/spaCy-3.7%2B-09A3D5?style=for-the-badge&logo=spacy&logoColor=white" alt="spaCy" />
   <img src="https://img.shields.io/badge/HuggingFace-SentenceTransformers-yellow?style=for-the-badge&logo=huggingface&logoColor=white" alt="HuggingFace" />
+  <img src="https://img.shields.io/badge/ReportLab-PDF%20Generation-red?style=for-the-badge" alt="ReportLab" />
   <img src="https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
   <img src="https://img.shields.io/badge/Groq-LLM%20Inference-F55036?style=for-the-badge" alt="Groq" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
 </p>
 
-An enterprise-grade, AI-driven **Applicant Tracking System (ATS) Resume Scorer and Optimizer**. This application empowers job seekers and recruiters to evaluate resumes against target job descriptions using cutting-edge Natural Language Processing (NLP), semantic embeddings, and LLM-powered recommendations.
+An enterprise-grade, AI-driven **Applicant Tracking System (ATS) Resume Scorer, Optimizer, and Resume Builder**. This application empowers job seekers and recruiters to evaluate resumes against target job descriptions using Natural Language Processing (NLP), semantic embeddings, and LLM-powered recommendations, and generate 100% ATS-compliant resumes in seconds.
 
 ---
 
@@ -35,43 +36,51 @@ An enterprise-grade, AI-driven **Applicant Tracking System (ATS) Resume Scorer a
 
 ## 🔍 Overview
 
-Modern companies filter out up to 75% of resumes before human review using Automated Applicant Tracking Systems (ATS). The **ATS Resume Scorer & Analyzer** bridges this gap by dissecting resume documents, testing them against industry ATS criteria, computing semantic similarity against job requirements, and providing tailored improvements.
+Modern companies filter out up to 75% of resumes before human review using Automated Applicant Tracking Systems (ATS). The **ATS Resume Scorer & Analyzer** bridges this gap by dissecting resume documents, testing them against industry ATS criteria, computing semantic similarity against job requirements, providing tailored improvements, and offering a built-in **ATS-Friendly Resume Builder** to generate pre-optimized resumes that pass every parser.
 
 ---
 
 ## ✨ Key Features
 
-### 1. Multi-Format Resume Parsing
-- Extracts raw text, structured sections, and contact metadata from `.pdf`, `.docx`, and `.doc` files (up to 5 MB).
-- Resilient PDF text extraction using `pdfplumber` / `pypdf` with encoding normalization.
+### 1. 📝 ATS-Friendly Resume Builder & Generator (New!)
+- **7-Tab Interactive Form**: Enter personal details, professional summary, categorized skills, work experience, projects, education, certifications, and achievements.
+- **✨ 1-Click Sample Profile Preloader**: Immediately populate all fields with a realistic, high-scoring tech profile for testing and inspiration.
+- **Strict Single-Column ATS Standards**: Built with Python's `reportlab` engine adhering strictly to ATS typography, margin, and layout hygiene guidelines.
+- **Customizable Color Accents**: Choose between *Modern Navy, Classic Charcoal, Slate Blue, or Forest Green*.
+- **Multi-Format Export**: Download as a printable, ATS-optimized PDF or export as clean plain text (`.txt`) for copy-pasting into job portals.
+- **⚡ Direct ATS Scorer Integration**: 1-click button transfering your newly generated resume into the ATS Scorer to test and verify its compatibility score on the spot.
 
-### 2. Comprehensive 5-Component ATS Scoring
+### 2. Multi-Format Resume Parsing
+- Extracts raw text, structured sections, and contact metadata from `.pdf`, `.docx`, and `.doc` files (up to 5 MB).
+- Resilient PDF text extraction using `pdfplumber` / `pypdf` with encoding normalization and multi-engine fallbacks.
+
+### 3. Comprehensive 5-Component ATS Scoring
 Calculates a weighted, 100-point overall score across five key dimensions:
-- **Formatting & Structure (20%)**: Section header detection, layout hygiene, contact details completeness.
+- **Formatting & Structure (20%)**: Section header detection, single-column reading order, contact details completeness.
 - **Keyword Coverage (25%)**: Industry keywords and job-specific terminology frequency.
 - **Content & Impact (25%)**: Action verbs, measurable metrics, quantifiable achievements, and sentence structure.
 - **Skill Validation (15%)**: Distinguishes between keyword-stuffed claims vs. skills backed by contextual evidence in project/experience bullets.
 - **ATS Compatibility (15%)**: Readability index, file parsing cleanliness, and absence of ATS-unfriendly artifacts.
 
-### 3. Deep Job Description (JD) Gap Analysis
+### 4. Deep Job Description (JD) Gap Analysis
 - **Semantic Similarity (40% JD weight)**: Computed via `SentenceTransformer` (`all-MiniLM-L6-v2`) cosine embeddings.
 - **Keyword Match Rate (60% JD weight)**: Extracts high-value requirements and flags:
   - Matched keywords
   - Missing keywords & competencies
   - Skill gaps prioritized by importance
 
-### 4. AI-Powered Actionable Recommendations
-- Powered by **Groq Cloud LLM** inference for low-latency, high-precision recommendations.
-- Specific, context-aware rewriting suggestions for resume bullet points.
-- Instant quick-fix action checklists for immediate score improvements.
+### 5. Resilient Offline NLP Fallback Engine
+- **Hybrid AI Pipeline**: Blends **Groq Cloud LLM** inference for low-latency recommendations with a robust **local regex and NLP parser**.
+- **Zero 500 Crashes**: If Groq credentials are unset, expired, or offline, the system automatically falls back to its built-in catalog of ~150+ technical skills and action verbs without interrupting analysis.
 
-### 5. PDF Audit Report Export
+### 6. PDF Audit Report Export
 - Compiles modular HTML report templates (`summary.html`, `jd_comparison.html`, `action_items.html`, `quick_actions.html`).
 - Converts reports into downloadable, print-ready PDF audit documents.
 
-### 6. Cloud Persistence & User Authentication
+### 7. Cloud Persistence & User Authentication
 - **Supabase Authentication**: Secure user sign-up, login, and session tokens.
-- **Scan History**: Retains past resume evaluations, historical score trends, and archived PDF downloads.
+- **Guest Mode**: Full scoring and report generation available locally without requiring sign-in.
+- **Scan History**: Retains past resume evaluations, historical score trends, and archived PDF downloads for authenticated users.
 
 ---
 
@@ -89,8 +98,8 @@ Calculates a weighted, 100-point overall score across five key dimensions:
 |                                      FastAPI Backend (@ :8000)                                      |
 |                                                                                                     |
 |  +---------------------+   +---------------------+   +---------------------+   +-----------------+  |
-|  |   Resume Parser     |   |   spaCy NLP         |   | SentenceTransformer |   |  Groq LLM       |  |
-|  | (pdfplumber/docx)   |   | (en_core_web_md/sm) |   | (all-MiniLM-L6-v2)  |   | (AI Insights)   |  |
+|  |   Resume Parser     |   |   spaCy NLP         |   | SentenceTransformer |   |  Groq / Local   |  |
+|  | (pdfplumber/docx)   |   | (en_core_web_md/sm) |   | (all-MiniLM-L6-v2)  |   | Fallback NLP    |  |
 |  +----------+----------+   +----------+----------+   +----------+----------+   +--------+--------+  |
 |             |                         |                         |                       |           |
 |             +-------------------------+------------+------------+-----------------------+           |
@@ -100,58 +109,39 @@ Calculates a weighted, 100-point overall score across five key dimensions:
 |                                      | (5-Component Calculation) |                                  |
 |                                      +-------------+-------------+                                  |
 |                                                    |                                                |
-|                                                    v                                                |
-|                                      +---------------------------+                                  |
-|                                      |  PDF Export & Generator   |                                  |
-|                                      | (Jinja2 Templates -> PDF) |                                  |
-|                                      +---------------------------+                                  |
-+----------------------------------------------------+------------------------------------------------+
-                                                     |
-                                                     v
-                                      +-----------------------------+
-                                      |     Supabase Cloud          |
-                                      |  * Auth (JWT Validation)    |
-                                      |  * History & Scan Storage   |
-                                      +-----------------------------+
+|                     +------------------------------+------------------------------+                 |
+|                     v                                                             v                 |
+|         +-----------------------+                                     +-----------------------+     |
+|         |  ReportLab & xhtml2pdf|                                     | Supabase Cloud DB     |     |
+|         |  (PDF Audit & Resume) |                                     | (History & Auth)      |     |
+|         +-----------------------+                                     +-----------------------+     |
++-----------------------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 📊 Scoring Engine & Methodology
+## ⚖️ Scoring Engine & Methodology
 
-| Component | Default Weight | Key Signals Evaluated |
+| Component | Weight | Criteria Evaluated |
 | :--- | :---: | :--- |
-| **Formatting** | **20%** | Standard section headers, email/phone presence, clean structure |
-| **Keywords** | **25%** | Domain keywords, technical proficiencies, role-specific vocabulary |
-| **Content** | **25%** | Active voice, power verbs, quantified metrics (`%`, `$`, numbers) |
-| **Skill Validation** | **15%** | Contextual proof for claimed skills within work experience |
-| **ATS Compatibility** | **15%** | Standard fonts, readable formatting, absence of tables/images |
-
-When a **Job Description** is provided, the system computes an aligned **JD Match Percentage**:
-$$\text{JD Match Score} = (0.60 \times \text{Keyword Match}) + (0.40 \times \text{Semantic Cosine Similarity})$$
+| **Formatting** | 20% | Clear section headers (`Experience`, `Education`, `Skills`), contact presence, single-column parsing fidelity |
+| **Keywords** | 25% | Industry terms, skill density, technical vocabulary, alignment with industry norms |
+| **Content** | 25% | Presence of metric-driven accomplishments (`%`, `$`, numbers), action verbs (`Spearheaded`, `Engineered`) |
+| **Skill Validation** | 15% | Semantic link between listed skills and project/work bullet points (discourages keyword stuffing) |
+| **ATS Compatibility** | 15% | Plain text extractability, low risk of character encoding distortion, clean font structures |
 
 ---
 
-## 💻 Technology Stack
+## 🧰 Technology Stack
 
-### Backend
-- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Asynchronous REST API)
-- **Server**: [Uvicorn](https://www.uvicorn.org/)
-- **Validation**: [Pydantic v2](https://docs.pydantic.dev/)
-- **Template Engine**: [Jinja2](https://palletsprojects.com/p/jinja/)
-- **PDF Generation**: `weasyprint` / `xhtml2pdf`
-
-### Machine Learning & NLP
-- **Core NLP**: [spaCy](https://spacy.io/) (`en_core_web_md` / `en_core_web_sm`)
-- **Embeddings**: [SentenceTransformers](https://www.sbert.net/) (`all-MiniLM-L6-v2`)
-- **LLM Engine**: [Groq](https://groq.com/) API client for fast inference
-
-### Frontend
-- **Framework**: [Streamlit](https://streamlit.io/)
-- **Styling**: Custom CSS design system with glassmorphism effects and responsive charts
-
-### Cloud & Database
-- **Auth & Storage**: [Supabase](https://supabase.com/) Python Client
+- **Backend Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.10+)
+- **Frontend Dashboard**: [Streamlit](https://streamlit.io/)
+- **NLP & Linguistics**: [spaCy](https://spacy.io/) (`en_core_web_md` / `en_core_web_sm`)
+- **Semantic Embeddings**: [SentenceTransformers](https://www.sbert.net/) (`all-MiniLM-L6-v2`)
+- **Document Generation**: [ReportLab](https://www.reportlab.com/) & [xhtml2pdf](https://xhtml2pdf.readthedocs.io/)
+- **Document Parsers**: `pdfplumber`, `PyPDF2`, `python-docx`
+- **LLM Engine**: [Groq](https://groq.com/) API client with resilient local fallback parser
+- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL + Row Level Security)
 
 ---
 
@@ -174,142 +164,119 @@ ATS_SCORER/
 │   │   ├── ats_scorer.py             # 5-factor scoring engine
 │   │   ├── embedder_fallback.py      # Fallback vector embedder when GPU/Torch unavailable
 │   │   ├── feedback_engine.py        # Grammar, readability, and content evaluation
-│   │   ├── groq_parser.py            # LLM prompts for resume parsing & suggestions
+│   │   ├── groq_parser.py            # LLM prompts & offline regex/NLP fallback parser
 │   │   ├── jd_matcher.py             # Keyword gap analysis & semantic similarity
-│   │   ├── pdf_export.py             # HTML to PDF conversion service
+│   │   ├── pdf_export.py             # HTML to PDF audit report exporter
 │   │   ├── recommendation_engine.py  # Prioritized improvement roadmap generator
 │   │   ├── report_generator.py       # Jinja2 report rendering
 │   │   ├── resume_analyzer.py        # Full orchestration pipeline
 │   │   └── resume_parser.py          # Document text extraction (.pdf, .docx, .doc)
 │   ├── templates/                    # Jinja2 HTML templates for PDF reports
-│   │   ├── action_items.html
-│   │   ├── jd_comparison.html
-│   │   ├── quick_actions.html
-│   │   └── summary.html
-│   ├── utils/
-│   │   ├── file_utils.py             # File helpers and default fallbacks
-│   │   └── matching.py               # String matching and fuzzy comparisons
 │   └── main.py                       # FastAPI application entrypoint & lifespan
 │
 ├── frontend/
 │   ├── .streamlit/
-│   │   ├── assets/
-│   │   │   └── styles.css            # Custom CSS styling & UI enhancements
 │   │   └── config.toml               # Streamlit server & theme configurations
 │   ├── components/                   # Modular UI components
-│   │   ├── action_items.py           # Priority action items card
 │   │   ├── dashboard.py              # Visual summary dashboard
 │   │   ├── detailed_feedback.py      # Tabulated section feedback
 │   │   ├── jd_comparison.py          # Side-by-side JD comparison widget
-│   │   ├── recommendations.py        # Tailored improvement recommendations
-│   │   ├── score_display.py          # Gauge charts & overall score badges
-│   │   ├── skill_validation.py       # Validated vs unvalidated skills breakdown
-│   │   └── strengths_issues.py       # Strengths and issues cards
+│   │   └── recommendations.py        # Tailored improvement recommendations
 │   ├── services/
 │   │   ├── api_client.py             # HTTP client communicating with FastAPI backend
+│   │   ├── resume_generator.py       # ATS-compliant PDF & Plain-Text Resume Builder engine
 │   │   └── supabase_client.py        # Frontend Supabase authentication handling
 │   ├── views/                        # Streamlit pages
+│   │   ├── builder.py                # ATS-Friendly Resume Builder panel
 │   │   ├── history.py                # Scan history and report downloads
 │   │   ├── landing.py                # Hero section & feature tour
 │   │   ├── resources.py              # ATS resume building guides & resources
 │   │   └── scorer.py                 # Core resume upload & evaluation view
 │   ├── app.py                        # Streamlit main entrypoint
-│   └── streamlite_app.py             # Standalone fallback interface
+│   └── streamlite_app.py             # Complete modular application view router
 │
-├── .gitignore                        # Git exclusion rules
-├── main.py                           # Root runner script
-├── pyproject.toml                    # Project package metadata
+├── .env.example                      # Sample environment variables
 ├── requirements.txt                  # Python dependencies
-├── run_app.bat                       # Windows one-click launcher
-└── README.md                         # Project documentation
+├── run_app.bat                       # 1-Click launcher for Backend + Frontend
+└── main.py                           # Root runner script
 ```
 
 ---
 
 ## ⚙️ Prerequisites
 
-- **Python**: Version `3.10` or higher
-- **Git** installed
-- **API Keys**:
-  - [Groq Cloud API Key](https://console.groq.com/)
-  - [Supabase Project URL & Anon Key](https://supabase.com/)
+Ensure you have the following installed:
+- **Python 3.10 or higher** (Python 3.11 recommended)
+- **Git**
+- **pip** package manager
+
+Optional third-party accounts:
+- [Groq Cloud API Key](https://console.groq.com/) *(Optional: local NLP parser active by default)*
+- [Supabase Account](https://supabase.com/) *(Optional: guest mode enabled by default)*
 
 ---
 
-## 📦 Installation & Setup
+## 🚀 Installation & Setup
 
-### 1. Clone the Repository
+### 1. Clone Repository
 ```bash
 git clone https://github.com/Ronakjain935/ATS_SCORER.git
 cd ATS_SCORER
 ```
 
-### 2. Create and Activate Virtual Environment
+### 2. Create Virtual Environment
 ```bash
 # Windows
 python -m venv venv
-.\venv\Scripts\activate
+venv\Scripts\activate
 
 # macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install Required Dependencies
+### 3. Install Dependencies
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Download spaCy Language Models
+### 4. Download spaCy Model
 ```bash
-python -m spacy download en_core_web_md
-# Fallback model (optional but recommended)
 python -m spacy download en_core_web_sm
+# Optional higher accuracy model:
+python -m spacy download en_core_web_md
 ```
 
 ---
 
 ## 🔑 Environment Configuration
 
-Create a `.env` file in the `backend/` directory by copying the provided example:
-
-```bash
-# Windows
-copy backend\.env.example backend\.env
-
-# macOS / Linux
-cp backend/.env.example backend/.env
-```
-
-Open `backend/.env` and specify your credentials:
+Create a `.env` file in the project root:
 
 ```env
-# Groq API Key for AI parser and recommendations
-GROQ_API_KEY=gsk_your_groq_api_key_here
+# Groq API Key (Optional - application runs offline NLP fallback if not provided)
+GROQ_API_KEY=your_groq_api_key_here
 
-# Supabase Project Configurations
+# Supabase Credentials (Optional - local Guest Mode enabled by default)
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your_supabase_anon_key_here
-SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_JWT_SECRET=your_jwt_secret
 
-# Frontend Redirect URL
-AUTH_REDIRECTED_URL=http://localhost:8501
-
-# Optional: Override embedding model
-SENTENCE_TRANSFORMER_MODEL=all-MiniLM-L6-v2
+# Hugging Face Token (Optional)
+HF_TOKEN=your_huggingface_token_here
 ```
 
 ---
 
-## 🚀 Running the Application
+## 🏃 Running the Application
 
-### Method 1: One-Click Launcher (Windows)
-Double-click `run_app.bat` or execute in PowerShell:
+### Method 1: 1-Click Launcher (Windows)
+Double-click `run_app.bat` or run:
 ```cmd
 run_app.bat
 ```
-This automatically spins up both the FastAPI backend and Streamlit frontend in separate console windows.
+This automatically launches both the FastAPI backend and Streamlit frontend in parallel.
 
 ---
 
@@ -321,7 +288,6 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 - API Base: `http://localhost:8000`
 - Interactive Swagger Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
-- Redoc Alternative: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 #### Terminal 2 — Start Streamlit Frontend:
 ```bash
@@ -348,11 +314,12 @@ All backend routes are accessible under `/api/v1`.
 
 ## 🖥️ Frontend Navigation
 
-The Streamlit interface offers four dedicated views:
-1. **🏠 Landing**: Overview of system capabilities, features, and user authentication portal.
-2. **📊 Resume Scorer**: Upload `.pdf`/`.docx` resumes, paste job descriptions, and view live score cards, radar charts, and recommendations.
-3. **🕒 History**: Track past analyses, compare score improvements across iterations, and re-download PDF audits.
-4. **📚 Resources**: Actionable ATS tips, resume formatting best practices, and high-impact action verb cheat sheets.
+The Streamlit application includes five dedicated views:
+1. **🏠 Home**: Overview of system capabilities, features, and quick links.
+2. **🎯 ATS Scorer**: Upload `.pdf`/`.docx` resumes, compare against job descriptions, view multi-dimensional scores, radar charts, and suggestions.
+3. **📝 Resume Builder**: Interactive 7-tab resume builder generating clean, single-column ATS-compliant resumes with PDF & text export, plus 1-click ATS score testing.
+4. **📊 History**: Track past analyses, compare score improvements across iterations, and re-download PDF audits.
+5. **📚 Resources**: Actionable ATS guidelines, resume formatting best practices, and action-verb cheat sheets.
 
 ---
 

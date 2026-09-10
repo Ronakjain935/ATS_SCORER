@@ -1,6 +1,6 @@
 import io
 import os
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 try:
     import magic
@@ -203,7 +203,7 @@ def extract_text_from_pdf(file_data: bytes) -> str:
 def extract_text_from_docx(file_data: bytes) -> str:
     try:
         doc = Document(io.BytesIO(file_data))
-        text_parts = []
+        text_parts: List[str] = []
 
         for paragraph in doc.paragraphs:
             p_text = paragraph.text.strip()
@@ -215,7 +215,7 @@ def extract_text_from_docx(file_data: bytes) -> str:
                 row_cells = [cell.text.strip() for cell in row.cells if cell.text.strip()]
                 if row_cells:
                     # Deduplicate adjacent duplicate cells (common with merged cells in tables)
-                    unique_cells = []
+                    unique_cells: List[str] = []
                     for c in row_cells:
                         if not unique_cells or c != unique_cells[-1]:
                             unique_cells.append(c)
@@ -224,7 +224,7 @@ def extract_text_from_docx(file_data: bytes) -> str:
         text = '\n'.join(text_parts)
 
         # Extract embedded hyperlinks
-        urls = []
+        urls: List[str] = []
         seen = set()
         try:
             for rel in doc.part.rels.values():
@@ -290,9 +290,10 @@ def parse_resume_file(file_data: bytes, filename: str) -> Tuple[str, dict]:
     # Phase 01: Validate file
     try:
         is_valid, error_msg, file_type = validate_file(file_data, filename)
-        if not is_valid:
-            log_warning(f'Validation failed for file {filename}: {error_msg}', context='parse_resume_file')
-            raise FileValidationError(error_msg, user_message=error_msg)
+        if not is_valid or file_type is None:
+            err = error_msg or f"Unsupported file format for '{filename}'."
+            log_warning(f'Validation failed for file {filename}: {err}', context='parse_resume_file')
+            raise FileValidationError(err, user_message=err)
     except FileValidationError:
         raise
     except Exception as e:

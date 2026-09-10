@@ -2,7 +2,7 @@ import os
 from typing import Any, Dict, List, Optional
 import requests
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
 
 
 def _auth_headers(access_token: Optional[str] = None) -> Dict[str, str]:
@@ -106,7 +106,19 @@ def check_health() -> Dict[str, Any]:
     """
     Checks backend health and model readiness.
     """
-    url = f"{BACKEND_URL}/api/v1/health"
-    response = requests.get(url, timeout=10)
-    response.raise_for_status()
-    return response.json()
+    bases = [BACKEND_URL]
+    if "127.0.0.1" not in BACKEND_URL:
+        bases.append("http://127.0.0.1:8000")
+    if "localhost" not in BACKEND_URL:
+        bases.append("http://localhost:8000")
+
+    for base in bases:
+        for path in ["/api/v1/health", "/health"]:
+            try:
+                response = requests.get(f"{base}{path}", timeout=3)
+                if response.status_code == 200:
+                    return response.json()
+            except Exception:
+                continue
+
+    raise requests.exceptions.ConnectionError("Could not reach backend health endpoint")

@@ -32,11 +32,15 @@ def render():
     </div>
     """, unsafe_allow_html=True)
     
-    # Call-to-Action Button
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🚀 Start Analyzing Your Resume", use_container_width=True, type="primary"):
+    # Call-to-Action Buttons
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🚀 Analyze Existing Resume", use_container_width=True, type="primary", key="cta_landing_to_scorer"):
             st.session_state.current_view = 'scorer'
+            st.rerun()
+    with col2:
+        if st.button("📝 Build ATS-Friendly Resume", use_container_width=True, key="cta_landing_to_builder"):
+            st.session_state.current_view = 'builder'
             st.rerun()
     
     st.markdown("---")

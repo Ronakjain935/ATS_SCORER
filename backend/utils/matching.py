@@ -188,7 +188,7 @@ def fuzzy_match_keywords(
 
     is_text_pool = isinstance(reference_pool, str)
     normalized_ref_list = []
-    if not is_text_pool:
+    if not isinstance(reference_pool, str):
         normalized_ref_list = [normalize_skill(k) for k in reference_pool if k]
 
     for kw in target_keywords:
@@ -202,7 +202,7 @@ def fuzzy_match_keywords(
         seen.add(norm_kw)
 
         is_match = False
-        if is_text_pool:
+        if isinstance(reference_pool, str):
             if is_keyword_in_text(raw_kw, reference_pool, threshold=threshold):
                 is_match = True
         else:

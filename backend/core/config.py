@@ -6,6 +6,14 @@ try:
 except ImportError:
     pass
 
+# Suppress unauthenticated HF Hub advisory warning if no token is provided
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
+try:
+    from huggingface_hub.utils import logging as hf_logging
+    hf_logging.set_verbosity_error()
+except Exception:
+    pass
+
 #api metadata
 APP_TITLE='ATS RESUME ANALYZER API'
 APP_VERSION='1.0.0'
@@ -14,7 +22,8 @@ ALLOWED_ORIGINS=[
     "http://localhost:5173", # vite dev server(react)
     "http://localhost:3000", # create React app fallback
     "http://127.0.0.1:5173",
-
+    "http://localhost:8501", # Streamlit local
+    "http://127.0.0.1:8501",
 ]
 # file 
 MAX_FILE_SIZE_MB=5
@@ -40,6 +49,7 @@ JD_KEYWORD_WEIGHT=0.6
 JD_SEMANTIC_WEIGHT=0.4
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+HF_TOKEN = os.getenv('HF_TOKEN', '')
 
 SUPABASE_URL = os.getenv('SUPABASE_URL', '')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY', os.getenv('SUPABASE_ANON_KEY', ''))

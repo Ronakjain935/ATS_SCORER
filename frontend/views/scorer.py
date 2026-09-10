@@ -67,16 +67,24 @@ def _render_upload_area(analysis_mode: str):
     """Two-column upload widgets. Returns (resume_file, jd_file, jd_text)."""
     left, right = st.columns(2)
 
+    injected_resume = st.session_state.get("scorer_injected_resume")
     with left:
         st.markdown("### 📄 Upload Resume")
-        resume_file = st.file_uploader(
-            "Choose your resume file",
-            type=["pdf", "doc", "docx"],
-            help="Supported: PDF, DOC, DOCX (max 5 MB)",
-            key="resume_upload",
-        )
-        if resume_file:
-            st.success(f"✅ {resume_file.name} ({resume_file.size / 1024:.1f} KB)")
+        if injected_resume:
+            st.info(f"📄 **Loaded from Resume Builder**: `{injected_resume.name}` ({injected_resume.size / 1024:.1f} KB)")
+            if st.button("🔄 Upload a different file instead", key="btn_clear_injected_resume"):
+                st.session_state.pop("scorer_injected_resume", None)
+                st.rerun()
+            resume_file = injected_resume
+        else:
+            resume_file = st.file_uploader(
+                "Choose your resume file",
+                type=["pdf", "doc", "docx"],
+                help="Supported: PDF, DOC, DOCX (max 5 MB)",
+                key="resume_upload",
+            )
+            if resume_file:
+                st.success(f"✅ {resume_file.name} ({resume_file.size / 1024:.1f} KB)")
 
     jd_file: Optional[object] = None
     jd_text = ""
@@ -187,12 +195,11 @@ def render() -> None:
 
     access_token = st.session_state.get("access_token")
     if not access_token:
-        st.warning("⚠️ Sign in from the sidebar to analyze a resume.")
-        return
+        st.caption("💡 **Guest Mode**: Analysis runs locally and instant PDF/TXT reports are available. (Sign in from sidebar to sync with cloud account).")
 
     _, mid, _ = st.columns([1, 2, 1])
     with mid:
-        analyze = st.button("🚀 Analyze Resume", use_container_width=True, type="primary")
+        analyze = st.button("🚀 Analyze Resume", use_container_width=True, type="primary", key="btn_analyze_resume")
 
     if not analyze:
         # Re-show previous result on rerun (e.g. after PDF generation).

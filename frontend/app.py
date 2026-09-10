@@ -7,4 +7,6 @@ if str(root_dir) not in sys.path:
     sys.path.insert(0, str(root_dir))
 
 # Import and execute the main Streamlit application
-from frontend.streamlite_app import *  # noqa: F401, F403
+from frontend.streamlite_app import main
+
+main()

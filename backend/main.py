@@ -7,8 +7,8 @@ if root_dir not in sys.path:
 
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Request
+from starlette.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core.config import (
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
         app.state.nlp = spacy.load(SPACY_MODEL_PRIMARY)
         logger.info(f'Loaded {SPACY_MODEL_PRIMARY}')
     except OSError:
-        logger.warning(f'{SPACY_MODEL_PRIMARY} not found - falling back ')
+        logger.warning(f'{SPACY_MODEL_PRIMARY} not found - falling back to {SPACY_MODEL_SECONDARY}')
         try:
             app.state.nlp = spacy.load(SPACY_MODEL_SECONDARY)
             logger.info(f'Loaded {SPACY_MODEL_SECONDARY} (fallback)')
@@ -85,7 +85,15 @@ app.include_router(router)
 
 @app.get("/", include_in_schema=False)
 async def root():
-    return RedirectResponse(url="http://localhost:8501")
+    return RedirectResponse(url="/docs")
+
+@app.get("/health", tags=["System"])
+async def root_health(request: Request):
+    return {
+        "status": "healthy",
+        "nlp_loaded": getattr(request.app.state, "nlp", None) is not None,
+        "embedder_loaded": getattr(request.app.state, "embedder", None) is not None,
+    }
 
 # Alias for case-insensitive uvicorn invocation (e.g. backend.main:App)
 App = app

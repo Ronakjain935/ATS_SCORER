@@ -13,10 +13,8 @@ except Exception:
     is_streamlit = False
 
 if is_streamlit:
-    try:
-        import frontend.app
-    except ImportError:
-        import frontend.streamlite_app
+    from frontend.streamlite_app import main
+    main()
 elif __name__ == "__main__":
     import uvicorn
     print("=" * 60)

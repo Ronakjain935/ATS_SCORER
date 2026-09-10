@@ -19,7 +19,20 @@ def render() -> None:
 
     access_token = st.session_state.get("access_token")
     if not access_token:
-        st.warning("⚠️ Sign in from the sidebar to view your history.")
+        st.info("ℹ️ Cloud history sync requires signing in from the sidebar.")
+        if st.session_state.get("scorer_analysis"):
+            st.success("📄 **Latest Analysis in this Session:**")
+            recent = st.session_state["scorer_analysis"]
+            score = recent.get("ATS_score", recent.get("ats_score", 0))
+            st.metric("Overall ATS Score", f"{score:.0f}/100")
+            if st.button("🎯 Open Full Results in ATS Scorer", key="btn_history_view_recent"):
+                st.session_state.current_view = "scorer"
+                st.rerun()
+        else:
+            st.warning("No analysis has been run in this session yet.")
+            if st.button("🚀 Analyze a Resume Now", key="btn_history_start_scorer"):
+                st.session_state.current_view = "scorer"
+                st.rerun()
         return
 
     try:
@@ -30,7 +43,7 @@ def render() -> None:
 
     if not history:
         st.info("No analyses yet for this account. Run a scoring on the ATS Scorer page first.")
-        if st.button("🎯 Go to ATS Scorer"):
+        if st.button("🎯 Go to ATS Scorer", key="btn_history_go_scorer"):
             st.session_state.current_view = "scorer"
             st.rerun()
         return

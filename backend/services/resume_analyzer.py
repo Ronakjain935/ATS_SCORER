@@ -139,6 +139,15 @@ def analyze_full_resume(
             if jd_comparison_result else []
         ),
         "strengths": _generate_strengths(parsed_resume, skills, projects, action_verbs, skill_validation, scores),
+        "critical_issues": [
+            f"{issue.issue_title}: {issue.how_to_fix}"
+            for issue in detailed_feedback
+            if getattr(issue, 'severity_level', '').lower() in ['critical', 'high', 'severe']
+        ],
+        "suggestions": [
+            f"{issue.issue_title}: {issue.how_to_fix}"
+            for issue in detailed_feedback
+        ],
         "interpretation":    scores.get('overall_interpretation', ''),
         "skill_validation_details": skill_validation_details,
         "experience_months": experience_months,
@@ -176,5 +185,12 @@ def _generate_strengths(
         strengths.append("Well-formatted and ATS-friendly structure")
     if scores.get('content_score', 0) >= 20:
         strengths.append("Content quality is high with measurable achievements")
+
+    if not strengths:
+        strengths.append("Resume parsed successfully with valid contact information")
+        if skills:
+            strengths.append(f"Identified technical skillset: {', '.join(skills[:5])}")
+        if projects:
+            strengths.append("Contains project demonstrations")
 
     return strengths
