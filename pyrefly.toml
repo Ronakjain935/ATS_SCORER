@@ -1,2 +1,1 @@
-python-interpreter-path = "venv/Scripts/python.exe"
 search-paths = [".", "backend", "frontend"]

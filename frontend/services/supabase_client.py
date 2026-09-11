@@ -112,10 +112,39 @@ def exchange_code_for_session(code: str) -> Dict[str, Any]:
         return {"error": str(exc)}
 
 
+_google_enabled: Optional[bool] = None
+
+
+def is_google_provider_enabled() -> bool:
+    global _google_enabled
+    if _google_enabled is not None:
+        return _google_enabled
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        _google_enabled = False
+        return False
+    try:
+        import httpx
+        url = f"{SUPABASE_URL.rstrip('/')}/auth/v1/settings"
+        resp = httpx.get(url, headers={"apikey": SUPABASE_KEY}, timeout=3.0)
+        if resp.status_code == 200:
+            data = resp.json()
+            _google_enabled = bool(data.get("external", {}).get("google", False))
+            return _google_enabled
+    except Exception:
+        pass
+    _google_enabled = False
+    return False
+
+
 def google_oauth_url() -> Dict[str, Any]:
     client = get_client()
     if not client:
         return {"error": "Supabase client not initialized."}
+
+    if not is_google_provider_enabled():
+        return {
+            "error": "Google Sign-In is not enabled in your Supabase project. Please use Email/Password login above, or enable Google in the Supabase Dashboard (Authentication -> Providers -> Google)."
+        }
 
     try:
         res = client.auth.sign_in_with_oauth({
@@ -130,4 +159,7 @@ def google_oauth_url() -> Dict[str, Any]:
             return {"url": res["url"]}
         return {"error": "OAuth redirect URL could not be generated."}
     except Exception as exc:
-        return {"error": str(exc)}
+        err_msg = str(exc)
+        if "Unsupported provider" in err_msg or "provider is not enabled" in err_msg:
+            err_msg = "Google sign-in is not enabled in your Supabase project (Authentication -> Providers -> Google)."
+        return {"error": err_msg}
