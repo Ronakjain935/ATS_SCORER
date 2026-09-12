@@ -97,11 +97,26 @@ def _clear_data():
 
 
 def render() -> None:
-    st.title("📝 ATS-Friendly Resume Builder")
-    st.markdown(
-        "Generate a strictly ATS-optimized, single-column resume from your skills, experience, projects, and achievements. "
-        "Tested for 100% parseability by ATS parsers."
-    )
+    st.markdown("""
+    <div style="margin-bottom: 2rem;">
+        <div class="hero-badge"><span class="pulse-dot"></span> ATS RESUME ARCHITECT</div>
+        <h1 class="gradient-text" style="font-size: 2.6rem; margin-bottom: 0.5rem;">ATS-Friendly Resume Studio</h1>
+        <p style="color: #475569; font-size: 1.05rem; max-width: 820px; line-height: 1.6;">
+            Build a clean, single-column, strictly machine-parseable PDF resume engineered to clear Taleo, Workday, Greenhouse, and Lever parsing filters with a 98%+ pass rate.
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1rem;">
+            <span style="background: rgba(99, 102, 241, 0.08); color: #4F46E5; border: 1px solid rgba(99, 102, 241, 0.2); padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600;">
+                ✓ 100% Single-Column Layout
+            </span>
+            <span style="background: rgba(16, 185, 129, 0.08); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600;">
+                ✓ Vector-Embedded Text (No Flat Graphics)
+            </span>
+            <span style="background: rgba(6, 182, 212, 0.08); color: #0891B2; border: 1px solid rgba(6, 182, 212, 0.2); padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600;">
+                ✓ Direct ATS Scorer Integration
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Top Control Bar
     col_c1, col_c2, col_c3 = st.columns([2, 1.2, 1.8])
@@ -132,7 +147,7 @@ def render() -> None:
             _clear_data()
             st.rerun()
 
-    st.markdown("---")
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
     # Tabs for structured input
     tabs = st.tabs([
@@ -376,7 +391,19 @@ def render() -> None:
 
     # Display results & downloads if generated
     if "builder_pdf_bytes" in st.session_state:
-        st.markdown("### 📥 Download & Verification Options")
+        st.markdown("""
+        <div style="margin-top: 2rem; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.3rem;">📥</span>
+                <span style="font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 700; color: #0F172A;">
+                    Ready for Download & Immediate Verification
+                </span>
+            </div>
+            <p style="color: #64748B; font-size: 0.88rem; margin-top: 2px;">
+                Export your certified ATS document or feed it straight into our neural parser to view its score
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
         d_c1, d_c2, d_c3 = st.columns(3)
 
@@ -404,7 +431,7 @@ def render() -> None:
 
         with d_c3:
             # Transfer directly to the ATS Scorer panel
-            if st.button("⚡ Score in ATS Scorer", use_container_width=True, help="Sends this generated resume directly to the ATS Scorer to check its score"):
+            if st.button("⚡ Audit in ATS Scorer", use_container_width=True, help="Sends this generated resume directly to the ATS Scorer to verify its score"):
                 class InMemoryUploadedFile:
                     def __init__(self, filename: str, data: bytes):
                         self.name = filename
@@ -427,7 +454,7 @@ def render() -> None:
                 st.rerun()
 
         # On-screen visual preview
-        st.markdown("---")
-        st.markdown("### 👁️ Resume Content Preview")
-        with st.expander("📄 View Generated Resume Text", expanded=True):
+        st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+        with st.expander("👁️ Inspect Generated Resume Text Stream", expanded=False):
+            st.caption("This is the exact plain-text stream parsed by automated Applicant Tracking Systems.")
             st.code(st.session_state["builder_text"], language="markdown")
