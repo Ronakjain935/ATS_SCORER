@@ -161,8 +161,16 @@ def _render_export_buttons(analysis: dict) -> None:
 
 
 def render() -> None:
-    st.title("🎯 ATS Resume Scorer")
-    st.markdown("Upload your resume — and optionally a job description — for a comprehensive analysis.")
+    st.markdown("""
+    <div style="margin-bottom: 1.75rem;">
+        <h1 style="font-family: 'Outfit', sans-serif; font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #1E1B4B 0%, #4F46E5 50%, #7C3AED 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px;">
+            🎯 ATS Resume Scorer & Analyzer
+        </h1>
+        <p style="color: #64748B; font-size: 1.05rem;">
+            Audit your resume against real applicant tracking system standards: formatting, keyword density, semantic validation, and content impact.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     with st.sidebar:
         st.markdown("---")

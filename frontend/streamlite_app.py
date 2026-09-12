@@ -75,39 +75,63 @@ def main():
 
     # Sidebar
     with st.sidebar:
-        st.markdown("## Navigation")
+        st.markdown("""
+        <div style="padding: 6px 0 16px 0;">
+            <div style="font-family: 'Outfit', sans-serif; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                <span>🎯 ATS SCORER</span>
+                <span style="font-size: 0.65rem; font-weight: 700; background: linear-gradient(135deg, #6366F1, #D946EF); color: white; padding: 2px 8px; border-radius: 9999px; letter-spacing: 0.06em;">PRO</span>
+            </div>
+            <div style="color: #94A3B8; font-size: 0.78rem; margin-top: 4px;">Next-Gen Resume Optimization</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         cur_view = st.session_state.current_view
 
-        if st.button("🏠 Home", use_container_width=True, key="btn_nav_home",
+        if st.button("🏠 Home Overview", use_container_width=True, key="btn_nav_home",
                      type="primary" if cur_view == "landing" else "secondary"):
             st.session_state.current_view = "landing"
             st.rerun()
 
-        if st.button("🎯 ATS Scorer", use_container_width=True, key="btn_nav_scorer",
+        if st.button("🎯 ATS Resume Scorer", use_container_width=True, key="btn_nav_scorer",
                      type="primary" if cur_view == "scorer" else "secondary"):
             st.session_state.current_view = "scorer"
             st.rerun()
 
-        if st.button("📝 Resume Builder", use_container_width=True, key="btn_nav_builder",
+        if st.button("📝 Smart Resume Builder", use_container_width=True, key="btn_nav_builder",
                      type="primary" if cur_view == "builder" else "secondary"):
             st.session_state.current_view = "builder"
             st.rerun()
 
-        if st.button("📊 History", use_container_width=True, key="btn_nav_history",
+        if st.button("📊 Analysis History", use_container_width=True, key="btn_nav_history",
                      type="primary" if cur_view == "history" else "secondary"):
             st.session_state.current_view = "history"
             st.rerun()
 
-        if st.button("📚 Resources", use_container_width=True, key="btn_nav_resources",
+        if st.button("📚 ATS Guide & Tips", use_container_width=True, key="btn_nav_resources",
                      type="primary" if cur_view == "resources" else "secondary"):
             st.session_state.current_view = "resources"
             st.rerun()
 
-        st.markdown("---")
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        st.markdown("<hr style='border-color: rgba(255,255,255,0.08); margin: 8px 0 16px 0;'>", unsafe_allow_html=True)
+
         if backend_online:
-            st.caption("🟢 **Backend API**: Connected")
+            st.markdown("""
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="pulse-dot"></div>
+                    <span style="color: #34D399; font-size: 0.84rem; font-weight: 600;">Neural Engine Online</span>
+                </div>
+                <div style="color: #94A3B8; font-size: 0.72rem; margin-top: 4px; padding-left: 14px;">spaCy + SentenceTransformers ready</div>
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            st.warning("⚠️ **Backend API**: Offline")
+            st.markdown("""
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px;">
+                <div style="color: #FBBF24; font-size: 0.84rem; font-weight: 600;">⚠️ Engine Offline</div>
+                <div style="color: #94A3B8; font-size: 0.72rem; margin-top: 4px;">Click button below to start backend process.</div>
+            </div>
+            """, unsafe_allow_html=True)
             if st.button("🚀 Start Backend Engine", key="btn_start_backend", use_container_width=True):
                 with st.spinner("Starting backend AI engine... (takes ~10s)"):
                     if backend_manager.ensure_backend_running(auto_start=True, wait_seconds=12):
@@ -115,9 +139,8 @@ def main():
                         st.rerun()
                     else:
                         st.error("Backend is still booting. Please wait a moment and click Rerun.")
-            st.caption("Auto-starts in cloud container or run `python main.py` locally.")
 
-        st.markdown("---")
+        st.markdown("<hr style='border-color: rgba(255,255,255,0.08); margin: 12px 0 16px 0;'>", unsafe_allow_html=True)
         st.markdown("### 👤 Account")
 
         supabase_configured = bool(supabase_client.SUPABASE_URL and supabase_client.SUPABASE_KEY)
