@@ -2,7 +2,27 @@ import os
 from typing import Any, Dict, List, Optional
 import requests
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+def get_backend_url() -> str:
+    """
+    Resolves backend URL with precedence:
+    1. os.environ['BACKEND_URL']
+    2. streamlit.secrets['BACKEND_URL']
+    3. Default to http://127.0.0.1:8000
+    """
+    url = os.getenv("BACKEND_URL", "").strip()
+    if not url:
+        try:
+            import streamlit as st
+            if hasattr(st, "secrets") and "BACKEND_URL" in st.secrets:
+                url = str(st.secrets["BACKEND_URL"]).strip()
+        except Exception:
+            pass
+    if not url:
+        url = "http://127.0.0.1:8000"
+    return url.rstrip("/")
+
+
+BACKEND_URL = get_backend_url()
 
 
 def _auth_headers(access_token: Optional[str] = None) -> Dict[str, str]:
@@ -20,7 +40,8 @@ def analyze_resume(
     """
     Sends resume file and optional JD to the backend for ATS scoring.
     """
-    url = f"{BACKEND_URL}/api/v1/analyze-resume"
+    base_url = get_backend_url()
+    url = f"{base_url}/api/v1/analyze-resume"
     headers = _auth_headers(access_token)
 
     # Read bytes and file name from Streamlit UploadedFile or file-like object
@@ -57,7 +78,7 @@ def generate_pdf(
     """
     Sends analysis result to backend to generate a combined PDF report.
     """
-    url = f"{BACKEND_URL}/api/v1/generate-pdf"
+    url = f"{get_backend_url()}/api/v1/generate-pdf"
     headers = _auth_headers(access_token)
     headers["Content-Type"] = "application/json"
 
@@ -70,7 +91,7 @@ def get_history(access_token: str) -> List[Dict[str, Any]]:
     """
     Retrieves the past analyses for the authenticated user.
     """
-    url = f"{BACKEND_URL}/api/v1/history"
+    url = f"{get_backend_url()}/api/v1/history"
     headers = _auth_headers(access_token)
 
     response = requests.get(url, headers=headers, timeout=30)
@@ -82,7 +103,7 @@ def delete_history_entry(analysis_id: str, access_token: str) -> Dict[str, Any]:
     """
     Deletes an analysis record from history.
     """
-    url = f"{BACKEND_URL}/api/v1/history/{analysis_id}"
+    url = f"{get_backend_url()}/api/v1/history/{analysis_id}"
     headers = _auth_headers(access_token)
 
     response = requests.delete(url, headers=headers, timeout=30)
@@ -94,7 +115,7 @@ def get_history_pdf(analysis_id: str, access_token: str) -> bytes:
     """
     Downloads historical analysis PDF by ID.
     """
-    url = f"{BACKEND_URL}/api/v1/history/{analysis_id}/pdf"
+    url = f"{get_backend_url()}/api/v1/history/{analysis_id}/pdf"
     headers = _auth_headers(access_token)
 
     response = requests.get(url, headers=headers, timeout=60)
@@ -102,20 +123,22 @@ def get_history_pdf(analysis_id: str, access_token: str) -> bytes:
     return response.content
 
 
-def check_health() -> Dict[str, Any]:
+def check_health(timeout: float = 3.0) -> Dict[str, Any]:
     """
     Checks backend health and model readiness.
     """
-    bases = [BACKEND_URL]
-    if "127.0.0.1" not in BACKEND_URL:
-        bases.append("http://127.0.0.1:8000")
-    if "localhost" not in BACKEND_URL:
-        bases.append("http://localhost:8000")
+    current_url = get_backend_url()
+    bases = [current_url]
+    if "127.0.0.1" in current_url or "localhost" in current_url:
+        if "http://127.0.0.1:8000" not in bases:
+            bases.append("http://127.0.0.1:8000")
+        if "http://localhost:8000" not in bases:
+            bases.append("http://localhost:8000")
 
     for base in bases:
         for path in ["/api/v1/health", "/health"]:
             try:
-                response = requests.get(f"{base}{path}", timeout=3)
+                response = requests.get(f"{base}{path}", timeout=timeout)
                 if response.status_code == 200:
                     return response.json()
             except Exception:

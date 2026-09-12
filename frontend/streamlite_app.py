@@ -5,7 +5,7 @@ from pathlib import Path
 # Put the repo root on sys.path so `from frontend.views import ...` resolves
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from frontend.services import api_client, supabase_client
+from frontend.services import api_client, backend_manager, supabase_client
 
 
 def load_css():
@@ -64,13 +64,14 @@ def main():
     # Apply CSS
     st.markdown(load_css(), unsafe_allow_html=True)
 
-    # Check backend connectivity
-    backend_online = False
-    try:
-        health = api_client.check_health()
-        backend_online = health.get("status") == "healthy"
-    except Exception:
-        backend_online = False
+    # Sync secrets to environment variables (for Streamlit Cloud deployments)
+    backend_manager.sync_secrets_to_env()
+
+    # Check backend connectivity with fast check
+    backend_online = backend_manager.is_backend_online(timeout=1.5)
+    if not backend_online and "backend_auto_started" not in st.session_state:
+        st.session_state.backend_auto_started = True
+        backend_online = backend_manager.ensure_backend_running(auto_start=True, wait_seconds=5)
 
     # Sidebar
     with st.sidebar:
@@ -106,8 +107,15 @@ def main():
         if backend_online:
             st.caption("🟢 **Backend API**: Connected")
         else:
-            st.warning("⚠️ **Backend API**: Offline (port 8000)")
-            st.caption("Launch backend with `python main.py` or run `run_app.bat`")
+            st.warning("⚠️ **Backend API**: Offline")
+            if st.button("🚀 Start Backend Engine", key="btn_start_backend", use_container_width=True):
+                with st.spinner("Starting backend AI engine... (takes ~10s)"):
+                    if backend_manager.ensure_backend_running(auto_start=True, wait_seconds=12):
+                        st.success("Backend started successfully!")
+                        st.rerun()
+                    else:
+                        st.error("Backend is still booting. Please wait a moment and click Rerun.")
+            st.caption("Auto-starts in cloud container or run `python main.py` locally.")
 
         st.markdown("---")
         st.markdown("### 👤 Account")
