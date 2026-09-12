@@ -33,7 +33,7 @@ def build_ats_resume_pdf(data: Dict[str, Any], theme_color: str = "#1A365D") -> 
         bottomMargin=36,
     )
 
-    story = []
+    story: List[Any] = []
     primary_color = colors.HexColor(theme_color)
     dark_neutral = colors.HexColor("#2D3748")
     subtle_neutral = colors.HexColor("#718096")
